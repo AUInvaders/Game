@@ -17,26 +17,40 @@ public class ScoreManager : MonoBehaviour
     private bool _dataRecieved = false;
     //private RecievedData _rd;
     //I toppen sammen med de andre privates
-    private ServerResponse _sr;
+    private Outer _sr;
+    public static int score = 0;
+    int Highscore = 0;
+    
+    public ScoreManager()
+    {
+        WebSocketClient.OnMessageEvent += this.OnMessage;
+    }
 
-    private void OnMessage(object sender, MessageEventArgs e)
+    void OnMessage(object sender, MessageEventArgs e)
     {
         //_sr = new ServerResponse();
         //_sr = JsonUtility.FromJson<ServerResponse>(e.Data);
         _dataRecieved = true;
-        print(e);
-        Debug.Log(e);
-        Debug.Log("Lortet er sendt");
+
+        _sr = new Outer();
+        _sr = JsonUtility.FromJson<Outer>(e.Data);
+        Highscore = _sr.Game.Highscore;
+
+        print(_sr.Game.Highscore+" Fra On message");
+        print(Highscore+" Highscore i onmessage");
+        HighscoreText.text = "Highscore: "+Highscore.ToString();
+        print(JsonUtility.ToJson(_sr));
+        print(e.Data);
+        Debug.Log("Lortet er modstaget");
     }
 
-    public static int score = 0;
-    int Highscore = 0;
+    
 
     private void Awake()
     {
         Instance = this; 
     }
-
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -51,22 +65,13 @@ public class ScoreManager : MonoBehaviour
         
         WebSocketClient.Send(request.ToString());
         //Highscore = game.Highscore;
-        /*do { } while (!_dataRecieved);
-        switch (_sr.Message)
-        {
-            case "OK":
-                {
-                    print(_sr.Message);
-                    
-                    break;
-                }
-                
-                    
-        }
-        */
+        do { } while (!_dataRecieved);
+        print(Highscore + " Fra Start");
+        HighscoreText.text = "Highscore: " + Highscore.ToString();
+
 
         scoreText.text = score.ToString() + " Coins!";
-        HighscoreText.text = "Highscore: " + Highscore.ToString();
+        
     }
 
     [Serializable]
@@ -102,17 +107,36 @@ public class ScoreManager : MonoBehaviour
     }
 }
 
+//------------------------------------------
 [Serializable]
-public class ServerResponse
+public class Outer
 {
+    public Outer()
+    {
+        Game = new ServerResponseGame();
+    }
+    public ServerResponseGame Game;
+}
+
+[Serializable]
+public class ServerResponseGame
+{
+    public ServerResponseGame()
+    {
+        User = new NestedServerResponse();
+    }
+    public int Highscore;
+    public int Coinsgained;
+    public string Starttime;
+    public NestedServerResponse User;
     public string Message;
     public int Code;
-    public List<NestedServerResponse> Games;
 }
 
 [Serializable]
 public class NestedServerResponse
 {
-    public int Coinsgained;
-    public int Highscore;
+    public string Username;
 }
+
+
