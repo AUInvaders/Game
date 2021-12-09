@@ -23,6 +23,7 @@ public class RegisterMenu : MonoBehaviour
     public GameObject wronguser_display;
     public GameObject wrongpass_display;
     public GameObject wrongconfpass_display;
+    public GameObject wrongEmail_display;
 
     private string Email;
     private string Username;
@@ -50,12 +51,12 @@ public class RegisterMenu : MonoBehaviour
     {
         if (Email == "")
         {
-            //wronguser_display.GetComponent<Text>().text = "Field is empty";
-            //wronguser_display.GetComponent<Text>().color = Color.red;
+            wrongEmail_display.GetComponent<Text>().text = "Field is empty";
+            wrongEmail_display.GetComponent<Text>().color = Color.red;
             return false;
         }
 
-        //wronguser_display.GetComponent<Text>().text = "";
+        wrongEmail_display.GetComponent<Text>().text = "";
         return true;
     }
 
@@ -120,7 +121,8 @@ public class RegisterMenu : MonoBehaviour
         {
             case "Username is already in use":
                 {
-                    print("Registration failed: User already exist");
+                    print("Registration failed: User already exists");
+                    username.GetComponent<Text>().text = "User already exists";
                     //Skriv at brugeren eksisterer i forvejen
 
                     _dataRecieved = false;
@@ -176,6 +178,10 @@ public class RegisterMenu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
+            if (email.GetComponent<InputField>().isFocused)
+            {
+                username.GetComponent<InputField>().Select();
+            }
             if (username.GetComponent<InputField>().isFocused)
             {
                 password.GetComponent<InputField>().Select();
